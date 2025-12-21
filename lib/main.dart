@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Química de Parejas',
+      debugShowCheckedModeBanner: false, // Quita el banner de DEBUG
       theme: ThemeData(
         primarySwatch: Colors.purple,
       ),
@@ -84,9 +85,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFF472B6),
-              Color(0xFFC084FC),
-              Color(0xFF818CF8),
+              Color(0xFFFF6B35), // Naranja cálido
+              Color(0xFFF7931E), // Naranja dorado
+              Color(0xFFFFC107), // Amarillo dorado
             ],
           ),
         ),
@@ -133,6 +134,14 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                             child: Image.asset(
                               'assets/images/logofinalsinfondo.png',
                               fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                // Si la imagen no se encuentra, muestra un ícono
+                                return const Icon(
+                                  Icons.favorite,
+                                  size: 80,
+                                  color: Color(0xFFFF6B35),
+                                );
+                              },
                             ),
                           ),
                         ),
@@ -302,10 +311,36 @@ class MenuScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
-                  Icons.favorite,
-                  size: 100,
-                  color: Colors.white,
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Image.asset(
+                        'assets/images/logofinalsinfondo.png',
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(
+                            Icons.favorite,
+                            size: 60,
+                            color: Color(0xFFFF6B35),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 const Text(
