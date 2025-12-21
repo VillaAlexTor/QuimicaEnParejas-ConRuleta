@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:math' as math;
 
 void main() {
@@ -15,11 +16,370 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.purple,
       ),
-      home: const QuimicaParejas(),
+      home: const SplashScreen(),
     );
   }
 }
 
+// ============ SPLASH SCREEN ============
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({Key? key}) : super(key: key);
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
+    );
+
+    _controller.forward();
+
+    // Navegar al menú después de 5 segundos
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => const MenuScreen(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 500),
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFF472B6),
+              Color(0xFFC084FC),
+              Color(0xFF818CF8),
+            ],
+          ),
+        ),
+        child: Center(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return FadeTransition(
+                opacity: _fadeAnimation,
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Texto Villa primero
+                      const Text(
+                        'Villa',
+                        style: TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 3,
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      // Logo
+                      Container(
+                        width: 180,
+                        height: 180,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Image.asset(
+                              'assets/images/logofinalsinfondo.png',
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      const Text(
+                        'Presenta',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white70,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        '💕 Química de Parejas',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ============ MENU SCREEN ============
+class MenuScreen extends StatelessWidget {
+  const MenuScreen({Key? key}) : super(key: key);
+
+  void _showInstructions(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: const LinearGradient(
+              colors: [Color(0xFFF472B6), Color(0xFFC084FC)],
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                '¿Cómo se juega?',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      '🎮 Se empieza eligiendo una temática',
+                      style: TextStyle(fontSize: 15, height: 1.6, fontWeight: FontWeight.w600),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      '👥 Se necesitan dos jugadores',
+                      style: TextStyle(fontSize: 15, height: 1.6),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      '🙈 Uno de los jugadores se tapa los ojos',
+                      style: TextStyle(fontSize: 15, height: 1.6),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      '🎡 El otro jugador gira la ruleta',
+                      style: TextStyle(fontSize: 15, height: 1.6),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      '👻 Al terminar de girar, se oculta la ruleta',
+                      style: TextStyle(fontSize: 15, height: 1.6),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      '💬 El jugador que giró la ruleta da una palabra de pista según la temática',
+                      style: TextStyle(fontSize: 15, height: 1.6),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      '🎯 El jugador que se tapó los ojos arrastra el puntero rojo hacia donde cree que están los puntos',
+                      style: TextStyle(fontSize: 15, height: 1.6),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      '⭐ El objetivo es sacar la mayor puntuación adivinando correctamente',
+                      style: TextStyle(fontSize: 15, height: 1.6, fontWeight: FontWeight.w600),
+                    ),
+                    SizedBox(height: 12),
+                    Divider(color: Colors.grey, thickness: 1),
+                    SizedBox(height: 8),
+                    Text(
+                      '🏆 PUNTUACIÓN:',
+                      style: TextStyle(fontSize: 16, height: 1.6, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      '🔥 Toca el 5 = 5 puntos\n💙 Toca el 3 = 3 puntos\n❤️ Toca el 1 = 1 punto\n😢 No tocar nada = 0 puntos',
+                      style: TextStyle(fontSize: 15, height: 1.6, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFFC084FC),
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: const Text(
+                  'Entendido',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFF472B6),
+              Color(0xFFC084FC),
+              Color(0xFF818CF8),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.favorite,
+                  size: 100,
+                  color: Colors.white,
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  '💕 Química de Parejas',
+                  style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Ruleta Secreta',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white70,
+                  ),
+                ),
+                const SizedBox(height: 60),
+                // Botón Jugar
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const QuimicaParejas()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color(0xFFC084FC),
+                    padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    elevation: 10,
+                  ),
+                  child: const Text(
+                    'Jugar',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Botón Cómo se juega
+                OutlinedButton(
+                  onPressed: () => _showInstructions(context),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: const BorderSide(color: Colors.white, width: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text(
+                    '¿Cómo se juega?',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ============ GAME SCREEN ============
 class QuimicaParejas extends StatefulWidget {
   const QuimicaParejas({Key? key}) : super(key: key);
 
@@ -28,18 +388,21 @@ class QuimicaParejas extends StatefulWidget {
 }
 
 class _QuimicaParejasState extends State<QuimicaParejas>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   double wheelRotation = 0;
   double pointerRotation = 90;
   bool isSpinning = false;
   bool isHidden = false;
   int? result;
   bool isDragging = false;
+  bool showConfetti = false;
   
   late AnimationController _animationController;
   late Animation<double> _animation;
+  late AnimationController _resultAnimationController;
+  late Animation<double> _resultScaleAnimation;
+  late Animation<double> _resultFadeAnimation;
 
-  // Sectores más gruesos: 8° cada uno (40° total en 180°)
   final List<WheelSector> sectors = [
     WheelSector(value: 1, color: Colors.red, start: 70, end: 78),
     WheelSector(value: 3, color: Colors.blue, start: 78, end: 86),
@@ -55,28 +418,49 @@ class _QuimicaParejasState extends State<QuimicaParejas>
       vsync: this,
       duration: const Duration(milliseconds: 3000),
     );
+
+    _resultAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _resultScaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _resultAnimationController,
+        curve: Curves.elasticOut,
+      ),
+    );
+
+    _resultFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _resultAnimationController,
+        curve: Curves.easeIn,
+      ),
+    );
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    _resultAnimationController.dispose();
     super.dispose();
   }
 
   void spinWheel() {
     if (isSpinning) return;
 
+    HapticFeedback.mediumImpact();
+
     setState(() {
       isSpinning = true;
       result = null;
       isHidden = false;
+      showConfetti = false;
     });
 
     final random = math.Random();
-    // Hacer muchas vueltas (5-8 vueltas completas)
-    final randomSpin = 1800 + random.nextDouble() * 1080; // 5-8 vueltas
-    // Posición final: SIEMPRE entre 70° y 110° (donde están los sectores, arriba del semicírculo)
-    final finalPosition = 70 + random.nextDouble() * 40; // Solo en la zona de sectores
+    final randomSpin = 1800 + random.nextDouble() * 1080;
+    final finalPosition = 70 + random.nextDouble() * 40;
     final newRotation = wheelRotation + randomSpin + finalPosition;
 
     _animation = Tween<double>(
@@ -92,6 +476,7 @@ class _QuimicaParejasState extends State<QuimicaParejas>
         wheelRotation = newRotation;
         isSpinning = false;
       });
+      HapticFeedback.lightImpact();
     });
   }
 
@@ -105,45 +490,20 @@ class _QuimicaParejasState extends State<QuimicaParejas>
   void verifyResult() {
     if (!isHidden || isSpinning) return;
 
-    // Normalizar la rotación de la ruleta a 0-360°
+    HapticFeedback.heavyImpact();
+
     final normalizedWheel = ((wheelRotation % 360) + 360) % 360;
-    
-    // Calcular qué sector de la ruleta está bajo el puntero
-    // pointerRotation va de 0 (derecha) a 180 (izquierda)
-    // Los sectores están dibujados después de restar 90, entonces:
-    // - sector original en 70-110° se dibuja efectivamente en -20 a 20° (o 340-20° en círculo completo)
-    // Después de rotar la ruleta, estos sectores se mueven
-    
-    // Convertir pointerRotation al sistema de la ruleta
-    // pointerRotation=0 (derecha) -> 0°
-    // pointerRotation=90 (arriba) -> 90°
-    // pointerRotation=180 (izquierda) -> 180°
-    
-    // Los sectores en el código usan un offset de -90, así que necesitamos compensar
-    // Ángulo del puntero en el sistema de sectores
     final pointerInSectorSystem = pointerRotation + 90;
-    
-    // Restar la rotación de la ruleta para obtener qué parte original está bajo el puntero
     final sectorAngleUnderPointer = ((pointerInSectorSystem - normalizedWheel) % 360 + 360) % 360;
     
-    // DEBUG: Ver los valores
-    print('=== VERIFICACIÓN ===');
-    print('Puntero visual: $pointerRotation°');
-    print('Ruleta rotada: $normalizedWheel°');
-    print('Puntero en sistema sectores: $pointerInSectorSystem°');
-    print('Ángulo de sector bajo puntero: $sectorAngleUnderPointer°');
-    
-    // Buscar si esta posición coincide con algún sector original (70-110°)
     WheelSector? matchedSector;
     for (final sector in sectors) {
       if (sectorAngleUnderPointer >= sector.start && sectorAngleUnderPointer < sector.end) {
         matchedSector = sector;
-        print('✓ Tocó sector original: ${sector.value} (${sector.start}-${sector.end}°)');
         break;
       }
     }
     
-    // Si no encontró, buscar en sectores reflejados (250-290°)
     if (matchedSector == null) {
       for (final sector in sectors.reversed) {
         final reflectedStart = 360 - sector.end;
@@ -151,33 +511,39 @@ class _QuimicaParejasState extends State<QuimicaParejas>
         
         if (sectorAngleUnderPointer >= reflectedStart && sectorAngleUnderPointer < reflectedEnd) {
           matchedSector = sector;
-          print('✓ Tocó sector reflejado: ${sector.value} ($reflectedStart-$reflectedEnd°)');
           break;
         }
       }
     }
     
-    if (matchedSector == null) {
-      print('✗ No tocó ningún sector');
-    }
-    
-    // Si no encuentra sector, devolver 0
     final resultValue = matchedSector?.value ?? 0;
 
     setState(() {
       result = resultValue;
       isHidden = false;
+      showConfetti = resultValue == 5;
     });
+
+    _resultAnimationController.forward(from: 0);
+
+    if (resultValue == 5) {
+      HapticFeedback.heavyImpact();
+      Future.delayed(const Duration(milliseconds: 100), () {
+        HapticFeedback.heavyImpact();
+      });
+    }
   }
 
   void resetGame() {
     setState(() {
       wheelRotation = 0;
-      pointerRotation = 90; // Esto lo deja apuntando arriba (Y)
+      pointerRotation = 90;
       isHidden = false;
       result = null;
+      showConfetti = false;
     });
     _animationController.reset();
+    _resultAnimationController.reset();
   }
 
   @override
@@ -189,67 +555,90 @@ class _QuimicaParejasState extends State<QuimicaParejas>
                 Container(
                   color: Colors.black.withOpacity(0.7),
                 ),
+                // Confetti
+                if (showConfetti) const ConfettiWidget(),
+                // Resultado
                 Center(
-                  child: Container(
-                    margin: const EdgeInsets.all(32),
-                    padding: const EdgeInsets.all(48),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          result.toString(),
-                          style: TextStyle(
-                            fontSize: 96,
-                            fontWeight: FontWeight.bold,
-                            color: result == 5
-                                ? Colors.amber
-                                : result == 3
-                                    ? Colors.blue
-                                    : result == 1
-                                        ? Colors.red
-                                        : Colors.grey,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          result == 0 ? '¡Fallaste!' : '¡$result Puntos!',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              result = null;
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.purple,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 32,
-                              vertical: 16,
-                            ),
-                            shape: RoundedRectangleBorder(
+                  child: AnimatedBuilder(
+                    animation: _resultAnimationController,
+                    builder: (context, child) {
+                      return FadeTransition(
+                        opacity: _resultFadeAnimation,
+                        child: ScaleTransition(
+                          scale: _resultScaleAnimation,
+                          child: Container(
+                            margin: const EdgeInsets.all(32),
+                            padding: const EdgeInsets.all(48),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(24),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.3),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
                             ),
-                          ),
-                          child: const Text(
-                            'Continuar',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  result.toString(),
+                                  style: TextStyle(
+                                    fontSize: 96,
+                                    fontWeight: FontWeight.bold,
+                                    color: result == 5
+                                        ? Colors.amber
+                                        : result == 3
+                                            ? Colors.blue
+                                            : result == 1
+                                                ? Colors.red
+                                                : Colors.grey,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  result == 0 ? '¡Fallaste!' : '¡$result Puntos!',
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      result = null;
+                                      showConfetti = false;
+                                    });
+                                    _resultAnimationController.reset();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.purple,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 32,
+                                      vertical: 16,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(24),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Continuar',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -269,7 +658,6 @@ class _QuimicaParejasState extends State<QuimicaParejas>
               child: SafeArea(
                 child: Column(
                   children: [
-                    // Header
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
@@ -293,8 +681,6 @@ class _QuimicaParejasState extends State<QuimicaParejas>
                         ],
                       ),
                     ),
-
-                    // Wheel Container - Con GestureDetector directo en la ruleta
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 80.0),
@@ -320,6 +706,7 @@ class _QuimicaParejasState extends State<QuimicaParejas>
                                 },
                                 onDragStart: () {
                                   if (isHidden && !isSpinning) {
+                                    HapticFeedback.selectionClick();
                                     setState(() {
                                       isDragging = true;
                                     });
@@ -336,13 +723,10 @@ class _QuimicaParejasState extends State<QuimicaParejas>
                         ),
                       ),
                     ),
-
-                    // Controls
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
-                          // Girar Ruleta
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton.icon(
@@ -360,8 +744,6 @@ class _QuimicaParejasState extends State<QuimicaParejas>
                             ),
                           ),
                           const SizedBox(height: 8),
-
-                          // Ocultar Ruleta
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton.icon(
@@ -379,8 +761,6 @@ class _QuimicaParejasState extends State<QuimicaParejas>
                             ),
                           ),
                           const SizedBox(height: 8),
-
-                          // Verificar
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton.icon(
@@ -398,8 +778,6 @@ class _QuimicaParejasState extends State<QuimicaParejas>
                             ),
                           ),
                           const SizedBox(height: 8),
-
-                          // Reiniciar
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton.icon(
@@ -419,8 +797,6 @@ class _QuimicaParejasState extends State<QuimicaParejas>
                         ],
                       ),
                     ),
-
-                    // Instructions
                     if (isHidden)
                       Container(
                         margin: const EdgeInsets.all(16),
@@ -447,6 +823,112 @@ class _QuimicaParejasState extends State<QuimicaParejas>
   }
 }
 
+// ============ CONFETTI WIDGET ============
+class ConfettiWidget extends StatefulWidget {
+  const ConfettiWidget({Key? key}) : super(key: key);
+
+  @override
+  State<ConfettiWidget> createState() => _ConfettiWidgetState();
+}
+
+class _ConfettiWidgetState extends State<ConfettiWidget> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  final List<ConfettiParticle> particles = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat();
+
+    final random = math.Random();
+    for (int i = 0; i < 50; i++) {
+      particles.add(ConfettiParticle(
+        x: random.nextDouble(),
+        y: -0.1,
+        color: Color.fromRGBO(
+          random.nextInt(255),
+          random.nextInt(255),
+          random.nextInt(255),
+          1,
+        ),
+        speed: 0.3 + random.nextDouble() * 0.5,
+        rotation: random.nextDouble() * math.pi * 2,
+      ));
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return CustomPaint(
+          size: MediaQuery.of(context).size,
+          painter: ConfettiPainter(particles, _controller.value),
+        );
+      },
+    );
+  }
+}
+
+class ConfettiParticle {
+  double x;
+  double y;
+  Color color;
+  double speed;
+  double rotation;
+
+  ConfettiParticle({
+    required this.x,
+    required this.y,
+    required this.color,
+    required this.speed,
+    required this.rotation,
+  });
+}
+
+class ConfettiPainter extends CustomPainter {
+  final List<ConfettiParticle> particles;
+  final double progress;
+
+  ConfettiPainter(this.particles, this.progress);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (var particle in particles) {
+      final y = particle.y + progress * particle.speed;
+      if (y > 1.1) continue;
+
+      final paint = Paint()..color = particle.color;
+      final rect = Rect.fromCenter(
+        center: Offset(particle.x * size.width, y * size.height),
+        width: 8,
+        height: 12,
+      );
+
+      canvas.save();
+      canvas.translate(particle.x * size.width, y * size.height);
+      canvas.rotate(particle.rotation + progress * math.pi * 4);
+      canvas.translate(-particle.x * size.width, -y * size.height);
+      canvas.drawRect(rect, paint);
+      canvas.restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(ConfettiPainter oldDelegate) => true;
+}
+
+// ============ WHEEL CLASSES ============
 class WheelSector {
   final int value;
   final Color color;
@@ -495,35 +977,26 @@ class WheelWidget extends StatelessWidget {
         final RenderBox box = context.findRenderObject() as RenderBox;
         final localPosition = box.globalToLocal(details.globalPosition);
         
-        // Centro del semicírculo
         final centerX = 150.0;
         final centerY = 150.0;
         
-        // Vector desde el centro hacia el toque
         final dx = localPosition.dx - centerX;
         final dy = localPosition.dy - centerY;
         
-        // Calcular ángulo usando atan2
         double angleRad = math.atan2(-dy, dx);
         double angleDeg = angleRad * (180 / math.pi);
         
-        // Convertir rangos negativos
         if (angleDeg < 0) {
           angleDeg = 360 + angleDeg;
         }
         
-        // Limitar al semicírculo superior
         if (angleDeg > 180 && angleDeg <= 270) {
           angleDeg = 180;
         } else if (angleDeg > 270) {
           angleDeg = 0;
         }
         
-        // INVERTIR para que siga el dedo correctamente
-        // 0° se convierte en 180° y viceversa
         angleDeg = 180 - angleDeg;
-        
-        // Clamp final
         angleDeg = angleDeg.clamp(0.0, 180.0);
         
         onPointerUpdate?.call(angleDeg);
@@ -537,7 +1010,6 @@ class WheelWidget extends StatelessWidget {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            // Marcador "0" - Ahora dentro de la pantalla
             Positioned(
               left: -55,
               bottom: 10,
@@ -568,8 +1040,6 @@ class WheelWidget extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Marcador "100" - Ahora dentro de la pantalla
             Positioned(
               right: -55,
               bottom: 10,
@@ -600,8 +1070,6 @@ class WheelWidget extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Wheel con ClipPath para ocultar triángulos fuera del semicírculo
             ClipPath(
               clipper: SemicircleClipper(),
               child: CustomPaint(
@@ -613,8 +1081,6 @@ class WheelWidget extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Pointer - Solo visible en el semicírculo
             if (pointerRotation >= 0 && pointerRotation <= 180)
               Transform.rotate(
                 angle: -(90 - pointerRotation) * math.pi / 180,
@@ -634,7 +1100,6 @@ class WheelWidget extends StatelessWidget {
   }
 }
 
-// Clipper para crear la máscara del semicírculo
 class SemicircleClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
@@ -674,7 +1139,6 @@ class WheelPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height);
     final radius = size.width / 2;
 
-    // Dibujar semicírculo de fondo
     final bgPaint = Paint()
       ..color = isHidden ? Colors.grey[600]! : Colors.white
       ..style = PaintingStyle.fill;
@@ -691,7 +1155,6 @@ class WheelPainter extends CustomPainter {
 
     canvas.drawPath(bgPath, bgPaint);
 
-    // Dibujar borde
     final borderPaint = Paint()
       ..color = isHidden ? Colors.grey[700]! : Colors.grey[300]!
       ..style = PaintingStyle.stroke
@@ -699,7 +1162,6 @@ class WheelPainter extends CustomPainter {
 
     canvas.drawPath(bgPath, borderPaint);
 
-    // Dibujar sectores si no está oculto
     if (!isHidden) {
       canvas.save();
       canvas.translate(center.dx, center.dy);
@@ -725,7 +1187,6 @@ class WheelPainter extends CustomPainter {
 
         canvas.drawPath(path, sectorPaint);
 
-        // Dibujar borde del sector
         final sectorBorderPaint = Paint()
           ..color = Colors.white
           ..style = PaintingStyle.stroke
@@ -733,7 +1194,6 @@ class WheelPainter extends CustomPainter {
 
         canvas.drawPath(path, sectorBorderPaint);
 
-        // Dibujar número más pequeño
         final midAngle = (sector.start + sector.end) / 2 - 90;
         final textX = (radius * 0.64) * math.cos(midAngle * math.pi / 180);
         final textY = (radius * 0.64) * math.sin(midAngle * math.pi / 180);
@@ -743,7 +1203,7 @@ class WheelPainter extends CustomPainter {
             text: sector.value.toString(),
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 16, // Reducido de 20 a 16
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -757,14 +1217,11 @@ class WheelPainter extends CustomPainter {
         );
       }
 
-      // DIBUJAR LA PARTE REFLEJADA (del otro lado del semicírculo)
-      // Crear sectores reflejados: si del lado derecho sale (3,1), del izquierdo sale (1,3)
       for (final sector in sectors.reversed) {
         final sectorPaint = Paint()
           ..color = sector.color
           ..style = PaintingStyle.fill;
 
-        // Reflejar: convertir 70-110° a 250-290° (lado opuesto)
         final reflectedStart = 360 - sector.end;
         final reflectedEnd = 360 - sector.start;
         
@@ -783,7 +1240,6 @@ class WheelPainter extends CustomPainter {
 
         canvas.drawPath(path, sectorPaint);
 
-        // Dibujar borde del sector reflejado
         final sectorBorderPaint = Paint()
           ..color = Colors.white
           ..style = PaintingStyle.stroke
@@ -791,7 +1247,6 @@ class WheelPainter extends CustomPainter {
 
         canvas.drawPath(path, sectorBorderPaint);
 
-        // Dibujar número reflejado
         final midAngle = ((reflectedStart + reflectedEnd) / 2 - 90) * math.pi / 180;
         final textX = (radius * 0.64) * math.cos(midAngle);
         final textY = (radius * 0.64) * math.sin(midAngle);
@@ -818,7 +1273,6 @@ class WheelPainter extends CustomPainter {
       canvas.restore();
     }
 
-    // Dibujar centro
     final centerPaint = Paint()
       ..color = Colors.grey[800]!
       ..style = PaintingStyle.fill;
@@ -853,6 +1307,23 @@ class PointerPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height);
 
+    // Efecto de brillo cuando está arrastrando
+    if (isDragging) {
+      final glowPaint = Paint()
+        ..color = const Color(0xFFDC2626).withOpacity(0.5)
+        ..style = PaintingStyle.fill
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+
+      final glowPath = Path()
+        ..moveTo(center.dx, center.dy)
+        ..lineTo(center.dx - 6, center.dy - 115)
+        ..lineTo(center.dx, center.dy - 135)
+        ..lineTo(center.dx + 6, center.dy - 115)
+        ..close();
+
+      canvas.drawPath(glowPath, glowPaint);
+    }
+
     final pointerPaint = Paint()
       ..color = const Color(0xFFDC2626)
       ..style = PaintingStyle.fill;
@@ -866,7 +1337,6 @@ class PointerPainter extends CustomPainter {
 
     canvas.drawPath(pointerPath, pointerPaint);
 
-    // Borde del puntero
     final pointerBorderPaint = Paint()
       ..color = const Color(0xFF991B1B)
       ..style = PaintingStyle.stroke
@@ -874,7 +1344,6 @@ class PointerPainter extends CustomPainter {
 
     canvas.drawPath(pointerPath, pointerBorderPaint);
 
-    // Círculo en la base
     canvas.drawCircle(center, 10, pointerPaint);
     canvas.drawCircle(center, 10, pointerBorderPaint);
   }
