@@ -132,7 +132,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           child: Padding(
                             padding: const EdgeInsets.all(20),
                             child: Image.asset(
-                              'assets/images/logofinalsinfondo.png',
+                              'assets/images/logofinalsinfondo1.png',
                               fit: BoxFit.contain,
                               errorBuilder: (context, error, stackTrace) {
                                 // Si la imagen no se encuentra, muestra un ícono
@@ -329,7 +329,7 @@ class MenuScreen extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(15),
                       child: Image.asset(
-                        'assets/images/logofinalsinfondo.png',
+                        'assets/images/logofinalsinfondo1.png',
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
                           return const Icon(
