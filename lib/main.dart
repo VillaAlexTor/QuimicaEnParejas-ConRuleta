@@ -130,7 +130,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         ),
                         child: ClipOval(
                           child: Padding(
-                            padding: const EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(6),
                             child: Image.asset(
                               'assets/images/logofinalsinfondo1.png',
                               fit: BoxFit.contain,
@@ -327,7 +327,7 @@ class MenuScreen extends StatelessWidget {
                   ),
                   child: ClipOval(
                     child: Padding(
-                      padding: const EdgeInsets.all(15),
+                      padding: const EdgeInsets.all(6),
                       child: Image.asset(
                         'assets/images/logofinalsinfondo1.png',
                         fit: BoxFit.contain,
