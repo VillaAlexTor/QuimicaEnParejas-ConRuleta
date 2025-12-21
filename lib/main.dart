@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:math' as math;
+import 'package:audioplayers/audioplayers.dart'; // Descomentar cuando instales el paquete
 
 void main() {
   runApp(const MyApp());
@@ -13,13 +14,21 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Química de Parejas',
-      debugShowCheckedModeBanner: false, // Quita el banner de DEBUG
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.purple,
       ),
       home: const SplashScreen(),
     );
   }
+}
+
+// ============ PLAYER DATA ============
+class Player {
+  final String name;
+  int score;
+
+  Player({required this.name, this.score = 0});
 }
 
 // ============ SPLASH SCREEN ============
@@ -53,7 +62,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _controller.forward();
 
-    // Navegar al menú después de 5 segundos
     Future.delayed(const Duration(seconds: 5), () {
       if (mounted) {
         Navigator.pushReplacement(
@@ -85,9 +93,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFFF6B35), // Naranja cálido
-              Color(0xFFF7931E), // Naranja dorado
-              Color(0xFFFFC107), // Amarillo dorado
+              Color(0xFFFF6B35),
+              Color(0xFFF7931E),
+              Color(0xFFFFC107),
             ],
           ),
         ),
@@ -102,7 +110,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Texto Villa primero
                       const Text(
                         'Villa',
                         style: TextStyle(
@@ -113,32 +120,30 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         ),
                       ),
                       const SizedBox(height: 40),
-                      // Logo
                       Container(
-                        width: 180,
-                        height: 180,
+                        width: 240,
+                        height: 240,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.3),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
+                              blurRadius: 25,
+                              offset: const Offset(0, 12),
                             ),
                           ],
                         ),
                         child: ClipOval(
                           child: Padding(
-                            padding: const EdgeInsets.all(6),
+                            padding: const EdgeInsets.all(8),
                             child: Image.asset(
                               'assets/images/logofinalsinfondo1.png',
                               fit: BoxFit.contain,
                               errorBuilder: (context, error, stackTrace) {
-                                // Si la imagen no se encuentra, muestra un ícono
                                 return const Icon(
                                   Icons.favorite,
-                                  size: 80,
+                                  size: 100,
                                   color: Color(0xFFFF6B35),
                                 );
                               },
@@ -215,55 +220,38 @@ class MenuScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
                     Text(
-                      '🎮 Se empieza eligiendo una temática',
+                      '🎮 Elijan una temática juntos',
                       style: TextStyle(fontSize: 15, height: 1.6, fontWeight: FontWeight.w600),
                     ),
                     SizedBox(height: 10),
                     Text(
-                      '👥 Se necesitan dos jugadores',
+                      '👥 Dos jugadores se turnan',
                       style: TextStyle(fontSize: 15, height: 1.6),
                     ),
                     SizedBox(height: 8),
                     Text(
-                      '🙈 Uno de los jugadores se tapa los ojos',
+                      '🙈 Uno se tapa los ojos',
                       style: TextStyle(fontSize: 15, height: 1.6),
                     ),
                     SizedBox(height: 8),
                     Text(
-                      '🎡 El otro jugador gira la ruleta',
+                      '🎡 El otro gira la ruleta',
                       style: TextStyle(fontSize: 15, height: 1.6),
                     ),
                     SizedBox(height: 8),
                     Text(
-                      '👻 Al terminar de girar, se oculta la ruleta',
+                      '💬 Da una pista según la categoría',
                       style: TextStyle(fontSize: 15, height: 1.6),
                     ),
                     SizedBox(height: 8),
                     Text(
-                      '💬 El jugador que giró la ruleta da una palabra de pista según la temática',
+                      '🎯 El que adivinó arrastra el puntero',
                       style: TextStyle(fontSize: 15, height: 1.6),
                     ),
                     SizedBox(height: 8),
                     Text(
-                      '🎯 El jugador que se tapó los ojos arrastra el puntero rojo hacia donde cree que están los puntos',
-                      style: TextStyle(fontSize: 15, height: 1.6),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      '⭐ El objetivo es sacar la mayor puntuación adivinando correctamente',
+                      '⭐ ¡Gana quien más puntos acumule!',
                       style: TextStyle(fontSize: 15, height: 1.6, fontWeight: FontWeight.w600),
-                    ),
-                    SizedBox(height: 12),
-                    Divider(color: Colors.grey, thickness: 1),
-                    SizedBox(height: 8),
-                    Text(
-                      '🏆 PUNTUACIÓN:',
-                      style: TextStyle(fontSize: 16, height: 1.6, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 6),
-                    Text(
-                      '🔥 Toca el 5 = 5 puntos\n💙 Toca el 3 = 3 puntos\n❤️ Toca el 1 = 1 punto\n😢 No tocar nada = 0 puntos',
-                      style: TextStyle(fontSize: 15, height: 1.6, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -312,29 +300,29 @@ class MenuScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  width: 120,
-                  height: 120,
+                  width: 160,
+                  height: 160,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.2),
-                        blurRadius: 15,
-                        offset: const Offset(0, 5),
+                        blurRadius: 18,
+                        offset: const Offset(0, 6),
                       ),
                     ],
                   ),
                   child: ClipOval(
                     child: Padding(
-                      padding: const EdgeInsets.all(6),
+                      padding: const EdgeInsets.all(8),
                       child: Image.asset(
                         'assets/images/logofinalsinfondo1.png',
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
                           return const Icon(
                             Icons.favorite,
-                            size: 60,
+                            size: 80,
                             color: Color(0xFFFF6B35),
                           );
                         },
@@ -360,12 +348,11 @@ class MenuScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 60),
-                // Botón Jugar
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const QuimicaParejas()),
+                      MaterialPageRoute(builder: (context) => const PlayerSetupScreen()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -386,7 +373,6 @@ class MenuScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Botón Cómo se juega
                 OutlinedButton(
                   onPressed: () => _showInstructions(context),
                   style: OutlinedButton.styleFrom(
@@ -414,9 +400,366 @@ class MenuScreen extends StatelessWidget {
   }
 }
 
+// ============ PLAYER SETUP SCREEN ============
+class PlayerSetupScreen extends StatefulWidget {
+  const PlayerSetupScreen({Key? key}) : super(key: key);
+
+  @override
+  State<PlayerSetupScreen> createState() => _PlayerSetupScreenState();
+}
+
+class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
+  final TextEditingController _player1Controller = TextEditingController();
+  final TextEditingController _player2Controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _player1Controller.dispose();
+    _player2Controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFF472B6),
+              Color(0xFFC084FC),
+              Color(0xFF818CF8),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  '👫 Nombres de Jugadores',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: _player1Controller,
+                        decoration: InputDecoration(
+                          labelText: '🎮 Jugador 1',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                        ),
+                        textCapitalization: TextCapitalization.words,
+                      ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: _player2Controller,
+                        decoration: InputDecoration(
+                          labelText: '🎮 Jugador 2',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                        ),
+                        textCapitalization: TextCapitalization.words,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 40),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_player1Controller.text.trim().isEmpty ||
+                          _player2Controller.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('¡Por favor ingresa ambos nombres!'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      final player1 = Player(name: _player1Controller.text.trim());
+                      final player2 = Player(name: _player2Controller.text.trim());
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CategorySetupScreen(
+                            player1: player1,
+                            player2: player2,
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFFC084FC),
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Continuar',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ============ CATEGORY SETUP SCREEN ============
+class CategorySetupScreen extends StatefulWidget {
+  final Player player1;
+  final Player player2;
+
+  const CategorySetupScreen({
+    Key? key,
+    required this.player1,
+    required this.player2,
+  }) : super(key: key);
+
+  @override
+  State<CategorySetupScreen> createState() => _CategorySetupScreenState();
+}
+
+class _CategorySetupScreenState extends State<CategorySetupScreen> {
+  final TextEditingController _customCategoryController = TextEditingController();
+  String? selectedCategory;
+
+  final List<String> predefinedCategories = [
+    '🎬 Películas',
+    '🍕 Comida',
+    '🌍 Lugares',
+    '💑 Parejas',
+    '🎵 Música',
+    '📚 Libros',
+    '🎮 Videojuegos',
+    '🏃 Deportes',
+  ];
+
+  @override
+  void dispose() {
+    _customCategoryController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFF472B6),
+              Color(0xFFC084FC),
+              Color(0xFF818CF8),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                const Text(
+                  '🎯 Elige una Categoría',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 30),
+                // Categorías predefinidas
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  alignment: WrapAlignment.center,
+                  children: predefinedCategories.map((category) {
+                    final isSelected = selectedCategory == category;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedCategory = category;
+                          _customCategoryController.clear();
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? Colors.white
+                              : Colors.white.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(25),
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 2,
+                          ),
+                        ),
+                        child: Text(
+                          category,
+                          style: TextStyle(
+                            color: isSelected
+                                ? const Color(0xFFC084FC)
+                                : Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 30),
+                const Text(
+                  'O escribe tu propia categoría:',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 15),
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: TextField(
+                    controller: _customCategoryController,
+                    decoration: InputDecoration(
+                      labelText: '✏️ Tu categoría',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                    ),
+                    textCapitalization: TextCapitalization.sentences,
+                    onChanged: (value) {
+                      if (value.isNotEmpty) {
+                        setState(() {
+                          selectedCategory = null;
+                        });
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(height: 40),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      final category = _customCategoryController.text.trim().isNotEmpty
+                          ? _customCategoryController.text.trim()
+                          : selectedCategory;
+
+                      if (category == null || category.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('¡Por favor elige o escribe una categoría!'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QuimicaParejas(
+                            player1: widget.player1,
+                            player2: widget.player2,
+                            category: category,
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFFC084FC),
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      '¡Empezar a Jugar!',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 // ============ GAME SCREEN ============
 class QuimicaParejas extends StatefulWidget {
-  const QuimicaParejas({Key? key}) : super(key: key);
+  final Player player1;
+  final Player player2;
+  final String category;
+
+  const QuimicaParejas({
+    Key? key,
+    required this.player1,
+    required this.player2,
+    required this.category,
+  }) : super(key: key);
 
   @override
   State<QuimicaParejas> createState() => _QuimicaParejasState();
@@ -431,12 +774,19 @@ class _QuimicaParejasState extends State<QuimicaParejas>
   int? result;
   bool isDragging = false;
   bool showConfetti = false;
+  int currentPlayerIndex = 0;
+  bool musicEnabled = false;
   
   late AnimationController _animationController;
   late Animation<double> _animation;
   late AnimationController _resultAnimationController;
   late Animation<double> _resultScaleAnimation;
   late Animation<double> _resultFadeAnimation;
+
+  // Descomentar cuando tengas el paquete audioplayers:
+  final AudioPlayer _spinPlayer = AudioPlayer();
+  final AudioPlayer _winPlayer = AudioPlayer();
+  final AudioPlayer _bgMusicPlayer = AudioPlayer();
 
   final List<WheelSector> sectors = [
     WheelSector(value: 1, color: Colors.red, start: 70, end: 78),
@@ -445,6 +795,8 @@ class _QuimicaParejasState extends State<QuimicaParejas>
     WheelSector(value: 3, color: Colors.blue, start: 94, end: 102),
     WheelSector(value: 1, color: Colors.red, start: 102, end: 110),
   ];
+
+  Player get currentPlayer => currentPlayerIndex == 0 ? widget.player1 : widget.player2;
 
   @override
   void initState() {
@@ -478,13 +830,29 @@ class _QuimicaParejasState extends State<QuimicaParejas>
   void dispose() {
     _animationController.dispose();
     _resultAnimationController.dispose();
+    // _spinPlayer.dispose();
+    // _winPlayer.dispose();
+    // _bgMusicPlayer.dispose();
     super.dispose();
+  }
+
+  void toggleMusic() {
+    setState(() {
+      musicEnabled = !musicEnabled;
+    });
+    // if (musicEnabled) {
+    //   _bgMusicPlayer.play(AssetSource('sounds/background.mp3'));
+    //   _bgMusicPlayer.setReleaseMode(ReleaseMode.loop);
+    // } else {
+    //   _bgMusicPlayer.stop();
+    // }
   }
 
   void spinWheel() {
     if (isSpinning) return;
 
     HapticFeedback.mediumImpact();
+    // _spinPlayer.play(AssetSource('sounds/spin.mp3'));
 
     setState(() {
       isSpinning = true;
@@ -553,6 +921,9 @@ class _QuimicaParejasState extends State<QuimicaParejas>
     
     final resultValue = matchedSector?.value ?? 0;
 
+    // Actualizar puntuación
+    currentPlayer.score += resultValue;
+
     setState(() {
       result = resultValue;
       isHidden = false;
@@ -561,11 +932,14 @@ class _QuimicaParejasState extends State<QuimicaParejas>
 
     _resultAnimationController.forward(from: 0);
 
-    if (resultValue == 5) {
-      HapticFeedback.heavyImpact();
-      Future.delayed(const Duration(milliseconds: 100), () {
+    if (resultValue > 0) {
+      // _winPlayer.play(AssetSource('sounds/win.mp3'));
+      if (resultValue == 5) {
         HapticFeedback.heavyImpact();
-      });
+        Future.delayed(const Duration(milliseconds: 100), () {
+          HapticFeedback.heavyImpact();
+        });
+      }
     }
   }
 
@@ -581,6 +955,123 @@ class _QuimicaParejasState extends State<QuimicaParejas>
     _resultAnimationController.reset();
   }
 
+  void nextTurn() {
+    setState(() {
+      currentPlayerIndex = currentPlayerIndex == 0 ? 1 : 0;
+      result = null;
+      showConfetti = false;
+      wheelRotation = 0;
+      pointerRotation = 90;
+      isHidden = false;
+    });
+    _animationController.reset();
+    _resultAnimationController.reset();
+  }
+
+  void showScoreboard() {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: const LinearGradient(
+              colors: [Color(0xFFF472B6), Color(0xFFC084FC)],
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                '🏆 Puntuaciones',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          widget.player1.name,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          widget.player1.score.toString(),
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: widget.player1.score > widget.player2.score
+                                ? Colors.green
+                                : Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Divider(thickness: 2),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          widget.player2.name,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          widget.player2.score.toString(),
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: widget.player2.score > widget.player1.score
+                                ? Colors.green
+                                : Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFFC084FC),
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: const Text(
+                  'Cerrar',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -590,9 +1081,7 @@ class _QuimicaParejasState extends State<QuimicaParejas>
                 Container(
                   color: Colors.black.withOpacity(0.7),
                 ),
-                // Confetti
                 if (showConfetti) const ConfettiWidget(),
-                // Resultado
                 Center(
                   child: AnimatedBuilder(
                     animation: _resultAnimationController,
@@ -619,6 +1108,15 @@ class _QuimicaParejasState extends State<QuimicaParejas>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
+                                  currentPlayer.name,
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
                                   result.toString(),
                                   style: TextStyle(
                                     fontSize: 96,
@@ -641,32 +1139,38 @@ class _QuimicaParejasState extends State<QuimicaParejas>
                                   ),
                                 ),
                                 const SizedBox(height: 24),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      result = null;
-                                      showConfetti = false;
-                                    });
-                                    _resultAnimationController.reset();
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.purple,
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 32,
-                                      vertical: 16,
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: nextTurn,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.purple,
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 24,
+                                          vertical: 16,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(24),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        'Siguiente Turno',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                     ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(24),
+                                    const SizedBox(width: 10),
+                                    IconButton(
+                                      onPressed: showScoreboard,
+                                      icon: const Icon(Icons.emoji_events),
+                                      iconSize: 32,
+                                      color: Colors.amber,
                                     ),
-                                  ),
-                                  child: const Text(
-                                    'Continuar',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -693,25 +1197,52 @@ class _QuimicaParejasState extends State<QuimicaParejas>
               child: SafeArea(
                 child: Column(
                   children: [
+                    // Header con info de jugador y música
                     Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: const [
-                          Text(
-                            '💕 Química de Parejas',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Turno de ${currentPlayer.name}',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Categoría: ${widget.category}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          SizedBox(height: 4),
-                          Text(
-                            'Ruleta Secreta',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                            ),
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: showScoreboard,
+                                icon: const Icon(Icons.emoji_events),
+                                color: Colors.amber,
+                                iconSize: 28,
+                              ),
+                              IconButton(
+                                onPressed: toggleMusic,
+                                icon: Icon(
+                                  musicEnabled ? Icons.music_note : Icons.music_off,
+                                ),
+                                color: Colors.white,
+                                iconSize: 28,
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -840,10 +1371,10 @@ class _QuimicaParejasState extends State<QuimicaParejas>
                           color: Colors.white.withOpacity(0.9),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Text(
-                          '🎯 Arrastra el puntero rojo hacia donde crees que está el número',
+                        child: Text(
+                          '🎯 ${currentPlayer.name}, arrastra el puntero hacia donde crees que está el número',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                             color: Colors.black87,
@@ -1342,7 +1873,6 @@ class PointerPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height);
 
-    // Efecto de brillo cuando está arrastrando
     if (isDragging) {
       final glowPaint = Paint()
         ..color = const Color(0xFFDC2626).withOpacity(0.5)
