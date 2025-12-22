@@ -6,10 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 void main() {
   runApp(const MyApp());
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-
 @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,28 +23,22 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 // ============ PLAYER DATA ============
 class Player {
   final String name;
   int score;
-
   Player({required this.name, this.score = 0});
 }
-
 // ============ SPLASH SCREEN ============
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
-
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
-
 class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
-
   @override
   void initState() {
     super.initState();
@@ -54,17 +46,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     );
-
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeIn),
     );
-
     _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
     );
-
     _controller.forward();
-
     Future.delayed(const Duration(seconds: 5), () {
       if (mounted) {
         Navigator.pushReplacement(
@@ -80,13 +68,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       }
     });
   }
-
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -183,11 +169,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
   }
 }
-
 // ============ MENU SCREEN ============
 class MenuScreen extends StatelessWidget {
   const MenuScreen({Key? key}) : super(key: key);
-
   void _showInstructions(BuildContext context) {
     showDialog(
       context: context,
@@ -281,7 +265,6 @@ class MenuScreen extends StatelessWidget {
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -402,26 +385,21 @@ class MenuScreen extends StatelessWidget {
     );
   }
 }
-
 // ============ PLAYER SETUP SCREEN ============
 class PlayerSetupScreen extends StatefulWidget {
   const PlayerSetupScreen({Key? key}) : super(key: key);
-
   @override
   State<PlayerSetupScreen> createState() => _PlayerSetupScreenState();
 }
-
 class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
   final TextEditingController _player1Controller = TextEditingController();
   final TextEditingController _player2Controller = TextEditingController();
-
   @override
   void dispose() {
     _player1Controller.dispose();
     _player2Controller.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -510,10 +488,8 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
                         );
                         return;
                       }
-
                       final player1 = Player(name: _player1Controller.text.trim());
                       final player2 = Player(name: _player2Controller.text.trim());
-
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -549,26 +525,21 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
     );
   }
 }
-
 // ============ CATEGORY SETUP SCREEN ============
 class CategorySetupScreen extends StatefulWidget {
   final Player player1;
   final Player player2;
-
   const CategorySetupScreen({
     Key? key,
     required this.player1,
     required this.player2,
   }) : super(key: key);
-
   @override
   State<CategorySetupScreen> createState() => _CategorySetupScreenState();
 }
-
 class _CategorySetupScreenState extends State<CategorySetupScreen> {
   final TextEditingController _customCategoryController = TextEditingController();
   String? selectedCategory;
-
   final List<String> predefinedCategories = [
     '🎬 Películas',
     '🍕 Comida',
@@ -579,13 +550,11 @@ class _CategorySetupScreenState extends State<CategorySetupScreen> {
     '🎮 Videojuegos',
     '🏃 Deportes',
   ];
-
   @override
   void dispose() {
     _customCategoryController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
