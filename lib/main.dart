@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:math' as math;
-import 'package:audioplayers/audioplayers.dart'; // Descomentar cuando instales el paquete
+// import 'package:audioplayers/audioplayers.dart'; // Descomentar cuando instales el paquete
 
 void main() {
   runApp(const MyApp());
@@ -784,9 +784,9 @@ class _QuimicaParejasState extends State<QuimicaParejas>
   late Animation<double> _resultFadeAnimation;
 
   // Descomentar cuando tengas el paquete audioplayers:
-  final AudioPlayer _spinPlayer = AudioPlayer();
-  final AudioPlayer _winPlayer = AudioPlayer();
-  final AudioPlayer _bgMusicPlayer = AudioPlayer();
+  // final AudioPlayer _spinPlayer = AudioPlayer();
+  // final AudioPlayer _winPlayer = AudioPlayer();
+  // final AudioPlayer _bgMusicPlayer = AudioPlayer();
 
   final List<WheelSector> sectors = [
     WheelSector(value: 1, color: Colors.red, start: 70, end: 78),
@@ -840,19 +840,19 @@ class _QuimicaParejasState extends State<QuimicaParejas>
     setState(() {
       musicEnabled = !musicEnabled;
     });
-    if (musicEnabled) {
-      _bgMusicPlayer.play(AssetSource('sounds/background.mp3'));
-      _bgMusicPlayer.setReleaseMode(ReleaseMode.loop);
-    } else {
-      _bgMusicPlayer.stop();
-    }
+    // if (musicEnabled) {
+    //   _bgMusicPlayer.play(AssetSource('sounds/background.mp3'));
+    //   _bgMusicPlayer.setReleaseMode(ReleaseMode.loop);
+    // } else {
+    //   _bgMusicPlayer.stop();
+    // }
   }
 
   void spinWheel() {
     if (isSpinning) return;
 
     HapticFeedback.mediumImpact();
-    _spinPlayer.play(AssetSource('sounds/spin.mp3'));
+    // _spinPlayer.play(AssetSource('sounds/spin.mp3'));
 
     setState(() {
       isSpinning = true;
@@ -933,7 +933,7 @@ class _QuimicaParejasState extends State<QuimicaParejas>
     _resultAnimationController.forward(from: 0);
 
     if (resultValue > 0) {
-      _winPlayer.play(AssetSource('sounds/win.mp3'));
+      // _winPlayer.play(AssetSource('sounds/win.mp3'));
       if (resultValue == 5) {
         HapticFeedback.heavyImpact();
         Future.delayed(const Duration(milliseconds: 100), () {
