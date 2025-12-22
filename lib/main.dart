@@ -875,6 +875,9 @@ class _QuimicaParejasState extends State<QuimicaParejas>
     ));
 
     _animationController.forward(from: 0).then((_) {
+      // Detener el sonido de giro cuando la animación termina
+      _spinPlayer.stop();
+      
       setState(() {
         wheelRotation = newRotation;
         isSpinning = false;
