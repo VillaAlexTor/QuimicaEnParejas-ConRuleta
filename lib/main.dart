@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.purple,
-        textTheme: GoogleFonts.poppinsTextTheme(
+        textTheme: GoogleFonts.caveatTextTheme(
           Theme.of(context).textTheme,
         ),
       ),
